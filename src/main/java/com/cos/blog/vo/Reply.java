@@ -1,4 +1,4 @@
-package com.cos.blog.VO;
+package com.cos.blog.vo;
 
 
 import lombok.AllArgsConstructor;
