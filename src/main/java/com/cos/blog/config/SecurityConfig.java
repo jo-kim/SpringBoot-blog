@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Autowired
     private PrincipalDetailService principalDetailService;
+
     @Bean // return 하는 값을 spring이 관리하게됨
     public BCryptPasswordEncoder encodePWD() { // 이 객체를 통해서 암호화가 됨
         return new BCryptPasswordEncoder();

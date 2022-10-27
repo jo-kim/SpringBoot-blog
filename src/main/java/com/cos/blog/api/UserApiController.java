@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +31,12 @@ public class UserApiController {
         return new ResponseDto<Integer>(HttpStatus.OK.value(), 1); // 자바오브젝트를 Json으로 변환해서 리턴(Jackson)
     }
 
+    @PutMapping("/user")
+    public ResponseDto<Integer> update(@RequestBody User user) {  // Json데이터 받고싶으면 @RequestBody 써야함
+        userService.update(user);
+        return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);
+
+    }
 //    @PostMapping("/api/user/login")
 //    public ResponseDto<Integer> login(@RequestBody User user, HttpSession session) {
 //        System.out.println("UserApiController: login 호출됨");
