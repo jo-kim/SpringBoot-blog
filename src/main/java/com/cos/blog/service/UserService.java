@@ -4,6 +4,10 @@ import com.cos.blog.repository.UserRepository;
 import com.cos.blog.vo.RoleType;
 import com.cos.blog.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,8 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder encoder;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
     // 전체가 하나의 트랜잭션으로 묶는 어노테이션
     @Transactional
     public void join(User user) {
@@ -43,6 +49,11 @@ public class UserService {
 
         persistence.setPassword(enPw);
         persistence.setEmail(user.getEmail());
+
+        // 세션등록
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         // 회원수정 함수 종료시 = 서비스 종료 = 트랜잭션 종료 = commit 이 자동으로됨
         // 커밋이 자동으로 된다는건
         //  ㄴ 영속화된 persistence 객체의 변화가 감지되면 더티체킹이 되어 update문을 날려줌
