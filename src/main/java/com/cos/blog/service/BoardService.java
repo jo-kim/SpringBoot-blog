@@ -1,8 +1,11 @@
 package com.cos.blog.service;
 
+import com.cos.blog.dto.ReplySaveRequestDto;
 import com.cos.blog.repository.BoardRepository;
+import com.cos.blog.repository.ReplyRepository;
 import com.cos.blog.repository.UserRepository;
 import com.cos.blog.vo.Board;
+import com.cos.blog.vo.Reply;
 import com.cos.blog.vo.RoleType;
 import com.cos.blog.vo.User;
 import lombok.RequiredArgsConstructor;
@@ -20,43 +23,73 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardService {
 
-    @Autowired
-    private BoardRepository boardRepository;
 
-  @Transactional
-    public void write(Board board, User user){
+    private final BoardRepository boardRepository;
+    private final ReplyRepository replyRepository;
 
-      board.setCount(0);
-      board.setUser(user);
-      boardRepository.save(board);
-  }
+    @Transactional
+    public void write(Board board, User user) {
+
+        board.setCount(0);
+        board.setUser(user);
+        boardRepository.save(board);
+    }
 
     @Transactional(readOnly = true)
     public Page<Board> boardList(Pageable pageable) {
 
         return boardRepository.findAll(pageable);
     }
+
     @Transactional(readOnly = true)
     public Board boardDetail(int id) {
-      return boardRepository.findById(id)
-              .orElseThrow(()->{
-                  return new IllegalArgumentException("글 상세보기 실패 : 아이디를 찾을 수 없습니다.");
-              });
+        return boardRepository.findById(id)
+                .orElseThrow(() -> {
+                    return new IllegalArgumentException("글 상세보기 실패 : 아이디를 찾을 수 없습니다.");
+                });
     }
 
     @Transactional
     public void deleteBoard(int id) {
-             boardRepository.deleteById(id);
+        boardRepository.deleteById(id);
     }
 
     @Transactional
     public void updateBoard(int id, Board requestBoard) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     return new IllegalArgumentException("글 찾기 실패 : 아이디를 찾을 수 없습니다.");
                 }); // 영속화 완료
         board.setTitle(requestBoard.getTitle());
         board.setContent(requestBoard.getContent());
         // 해당 함수로 종료시( Service가 종료될 때) 트랜잭션이 종료됨. 이때 더티 체킹 - 자동업데이트가 됨. db flush
+    }
+
+    @Transactional
+    public void writeReply(ReplySaveRequestDto replySaveRequestDto) {
+
+//        User user = userRepository.findById(replySaveRequestDto.getUserId())
+//                .orElseThrow(() -> {
+//                    return new IllegalArgumentException("댓글 쓰기 실패: 사용자 아이디를 찾을 수 없습니다.");
+//                });
+//
+//        Board board = boardRepository.findById(replySaveRequestDto.getBoardId())
+//                .orElseThrow(() -> {
+//                    return new IllegalArgumentException("댓글 쓰기 실패 : 게시글 아이디를 찾을 수 없습니다.");
+//                });
+//
+//        Reply reply = Reply.builder()
+//                .user(user)
+//                .board(board)
+//                .content(replySaveRequestDto.getContent())
+//                .build();
+//        replyRepository.save(reply);
+        int result = replyRepository.mSave(replySaveRequestDto.getUserId(), replySaveRequestDto.getBoardId(),replySaveRequestDto.getContent());
+        System.out.println(result);
+    }
+
+    @Transactional
+    public void deleteReply(int replyId) {
+        replyRepository.deleteById(replyId);
     }
 }

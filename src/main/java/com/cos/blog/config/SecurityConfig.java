@@ -37,7 +37,7 @@ public class SecurityConfig {
     // 해당 password 가 뭘로 해쉬가 되어 회원가입이 되었는지 알아야
     // 같은 해쉬로 암호화해서 DB에 있는 해쉬랑 비교할 수 있음
 
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(principalDetailService).passwordEncoder(encodePWD());
     }
 

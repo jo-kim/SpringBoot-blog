@@ -22,8 +22,7 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder encoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
     // 전체가 하나의 트랜잭션으로 묶는 어노테이션
     @Transactional
     public void join(User user) {
@@ -44,19 +43,27 @@ public class UserService {
             return new IllegalArgumentException("회원 찾기 실패");
         });
 
-        String rawPw = user.getPassword();
-        String enPw = encoder.encode(rawPw);
+        // validate 체크 oAuth값이 없으면 수정 가능
+        if (persistence.getOauth() == null || persistence.getOauth().equals("")) {
+            String rawPw = user.getPassword();
+            String enPw = encoder.encode(rawPw);
 
-        persistence.setPassword(enPw);
-        persistence.setEmail(user.getEmail());
+            persistence.setPassword(enPw);
+            persistence.setEmail(user.getEmail());
+        }
 
-        // 세션등록
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 회원수정 함수 종료시 = 서비스 종료 = 트랜잭션 종료 = commit 이 자동으로됨
         // 커밋이 자동으로 된다는건
         //  ㄴ 영속화된 persistence 객체의 변화가 감지되면 더티체킹이 되어 update문을 날려줌
+    }
+
+    @Transactional(readOnly = true)
+    public User findUser(String username) {
+        User user = userRepository.findByUsername(username).orElseGet(()-> {
+            return new User();
+        });
+        return user;
     }
 
 //    @Transactional(readOnly = true) // Select 할때 트랜잭션 시작, 서비스 종료시에 트랜잭션 종료 ( 정합성 )

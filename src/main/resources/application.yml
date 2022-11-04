@@ -1,4 +1,13 @@
 
+server:
+  port: 8000
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
   mvc:
     view:
@@ -26,13 +35,5 @@ spring:
     serialization:
       fail-on-empty-beans: false
 
-server:
-  port: 8000
-  servlet:
-    context-path: /
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
-
+cos:
+  key: cos1234
